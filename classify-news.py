@@ -66,10 +66,21 @@ test_vectors = vectorizer.transform(test_data.values.astype('U'))
 classifier = BernoulliNB()
 classifier.fit(train_vectors, train_labels)
 prediction = classifier.predict(test_vectors)
+probabilities = classifier.predict_proba(test_vectors)
 
-s = pd.Series(prediction)
-print (s.value_counts())
+# Transformação de probabilidades do classificador em scores
+scores = []
+for prob in probabilities:
+    if prob[0] >= prob[1]:
+        score = (100*(-prob[0]+1)/2)
+    else:
+        score = (100*(prob[1]+1)/2)
+    scores.append(score)
+
+
+test_df['label'] = prediction  
+test_df['score'] = scores
 
 # Escreve a classificação no banco de dados.
-test_df['label'] = s
+test_df = test_df.drop('index', axis = 1)
 test_df.to_sql('news_table', engine, if_exists='replace')
