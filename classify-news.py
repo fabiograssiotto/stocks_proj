@@ -2,13 +2,11 @@
 import pandas as pd
 import nltk
 import re
-from sqlalchemy import create_engine
-from sklearn.feature_extraction.text import CountVectorizer
-from nltk.stem.porter import PorterStemmer
-
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.metrics import classification_report
 from pandas import DataFrame
+from nltk.stem.porter import PorterStemmer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import BernoulliNB
+from sqlalchemy import create_engine
 
 # Transforma scores positivos/negativos em label.
 def create_label(row):
@@ -19,11 +17,12 @@ def create_label(row):
     else:
         return 'Negative'
 
-# Stemming e Tokenização
+# Stemming
 def stem_tokens(tokens, stemmer):
     stemmed = [stemmer.stem(item) for item in tokens]
     return(stemmed)
 
+# Tokenização
 def tokenize(text):
     text = re.sub("[^a-zA-Z]", " ", text)
     tokens = nltk.word_tokenize(text)
@@ -64,9 +63,13 @@ train_vectors = vectorizer.fit_transform(train_data.values.astype('U'))
 test_vectors = vectorizer.transform(test_data.values.astype('U'))
 
 # Classificação
-classifier = MultinomialNB()
+classifier = BernoulliNB()
 classifier.fit(train_vectors, train_labels)
 prediction = classifier.predict(test_vectors)
 
 s = pd.Series(prediction)
 print (s.value_counts())
+
+# Escreve a classificação no banco de dados.
+test_df['label'] = s
+test_df.to_sql('news_table', engine, if_exists='replace')
