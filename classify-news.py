@@ -79,7 +79,7 @@ for prob in probabilities:
 
 
 test_df['label'] = prediction  
-test_df['score'] = scores
+test_df['valence'] = scores
 
 # Escreve a classificação no banco de dados.
 test_df = test_df.drop('index', axis = 1)
