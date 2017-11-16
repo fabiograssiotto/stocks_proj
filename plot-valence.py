@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import seaborn as sns
+import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 import sys
@@ -12,10 +12,14 @@ else:
 
 engine = create_engine('sqlite:///news.db')
 table_name = 'news_table'
-df = pd.read_sql_query('SELECT publication_date, valence FROM news_table WHERE ticker="{0}"'.format(sys.argv[1]), engine)
-#df.set_index('publication_date')
+df = pd.read_sql_query('SELECT publication_date, valence, title FROM news_table WHERE ticker="{0}"'.format(sys.argv[1]), engine)
 df['publication_date'] = pd.to_datetime(df['publication_date'])
+df['date_num'] = df.publication_date.values.astype('datetime64[s]').astype('int')
+
 df.sort_values(by='publication_date')
 
-plt.scatter(df['publication_date'].values, df['valence'].values, s =100, c = 'red')
+# Remove duplicados e agrega valências em dias.
+df = df.drop_duplicates(subset='title', keep="last")
+a = df.groupby([pd.Grouper(freq='D',key='publication_date')]).mean()
+plt.plot(a['valence'], c = 'red')
 plt.show()
