@@ -11,17 +11,15 @@ def get_graph_data(ticker):
     df['date_num'] = df.publication_date.values.astype('datetime64[s]').astype('int')
     df.sort_values(by='publication_date')
 
-    # Remove duplicados e agrega valências em dias.
-    df = df.drop_duplicates(subset='title', keep="last")
-    return df.groupby([pd.Grouper(freq='W',key='publication_date')]).mean()
+    # Remove dados esparsos antes de 2016.
+    df = df[(df['publication_date'].dt.year > 2016)]
+    # Agrega valências por dia
+    return df.groupby([pd.Grouper(freq='D',key='publication_date')]).mean()
 
 engine = create_engine('sqlite:///news.db')
-table_name = 'news_table'
 
-#fig = plt.figure(figsize=(80, 60))
 fig = plt.figure()
 fig.suptitle('Valências de notícias de ações', fontsize=16)
-
 
 ticker_lst = ['AAPL', 'CSCO', 'FB', 'GOOGL', 'IBM', 'INTC', 'MSFT', 'ORCL', 'SAP', 'TSM']
 subplot_num = 1

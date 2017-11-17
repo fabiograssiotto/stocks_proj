@@ -13,5 +13,7 @@ disk_engine = create_engine('sqlite:///news.db')
 for file in news_files:
     df = pd.read_csv(file)
     df = df[['ticker', 'publication_date', 'title']]
+    # Remove entradas duplicadas
+    df = df.drop_duplicates(subset='title', keep="last")
     df.to_sql('news_table', disk_engine, if_exists='append')
     
