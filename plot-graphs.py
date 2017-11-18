@@ -11,14 +11,30 @@ def get_valence_data(ticker):
     df['date_num'] = df.publication_date.values.astype('datetime64[s]').astype('int')
     df.sort_values(by='publication_date')
 
+    df.query("publication_date >= '{0}'".format(date_from), inplace=True)
     # Agrega valências por dia
     return df.groupby([pd.Grouper(freq='D',key='publication_date')]).mean()
+
+# Verifica argumentos de chamada
+if len(sys.argv) == 1:
+    # desde o inicio dos tempos :)
+    date_from = "1970-01-01"
+elif (sys.argv[1] == '-h'):
+    print("Uso: plot-graphs.py YYYY-MM-DD, plota desde a data")
+    print("Sem argumentos, plota a base toda.")
+    sys.exit()
+else:
+    date_from = sys.argv[1]
 
 engine = create_engine('sqlite:///news.db')
 
 sns.set_style("white")
 fig, axs = plt.subplots(2,5)
-fig.suptitle('Valências de Notícias e Valores de Ações', fontsize=20)
+
+if len(sys.argv) == 1:
+    fig.suptitle('Valências de Notícias e Valores de Ações', fontsize=20)
+else:
+    fig.suptitle('Valências de Notícias e Valores de Ações desde {0}'.format(date_from))
 
 #ticker_lst = ['AAPL', 'CSCO', 'FB', 'GOOGL', 'IBM', 'INTC', 'MSFT', 'ORCL', 'SAP', 'TSM']
 ticker_lst = ['AAPL', 'CSCO', 'FB', 'IBM', 'INTC', 'MSFT', 'ORCL', 'SAP', 'TSM']
