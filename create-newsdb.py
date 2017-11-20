@@ -2,8 +2,13 @@
 # às ações de tecnologia.
 
 import glob
+import os
 import pandas as pd
 from sqlalchemy import create_engine
+from sqlalchemy import MetaData
+
+if os.path.exists('news.db'):
+    os.remove('news.db')
 
 news_files = glob.glob('news/*.csv')
 
@@ -16,4 +21,13 @@ for file in news_files:
     # Remove entradas duplicadas
     df = df.drop_duplicates(subset='title', keep="last")
     df.to_sql('news_table', disk_engine, if_exists='append')
+
+m = MetaData()
+m.reflect(disk_engine)
+print('News Database:')
+for table in m.tables.values():
+    print("Tabela: {0}".format(table.name))
+    print("Colunas:")
+    for column in table.c:
+        print(column.name)
     
