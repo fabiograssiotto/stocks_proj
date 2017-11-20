@@ -36,8 +36,9 @@ if len(sys.argv) == 1:
 else:
     fig.suptitle('Valências de Notícias e Valores de Ações desde {0}'.format(date_from))
 
-#ticker_lst = ['AAPL', 'CSCO', 'FB', 'GOOGL', 'IBM', 'INTC', 'MSFT', 'ORCL', 'SAP', 'TSM']
-ticker_lst = ['AAPL', 'CSCO', 'FB', 'IBM', 'INTC', 'MSFT', 'ORCL', 'SAP', 'TSM']
+ticker_lst = ['AAPL', 'CSCO', 'FB', 'GOOGL', 'IBM', 'INTC', 'MSFT', 'ORCL', 'SAP', 'TSM']
+#ticker_lst = ['AAPL', 'CSCO', 'FB', 'IBM', 'INTC', 'MSFT', 'ORCL', 'SAP', 'TSM']
+#ticker_lst = ['GOOGL']
 
 subplot_line = 0
 subplot_col = 0
@@ -54,6 +55,8 @@ for ticker in ticker_lst:
     plot_df = plot_df.dropna()
     plot_df = plot_df[['close', 'valence']]
 
+    # Para contornar erros de tipo na planilha de valor das ações.
+    plot_df['close'] = plot_df['close'].astype(str).astype(float)
     plot_df['date'] = plot_df.index
     plot_df['date_f'] = pd.factorize(plot_df['date'])[0] + 1
     mapping = dict(zip(plot_df['date_f'], plot_df['date'].dt.date))
