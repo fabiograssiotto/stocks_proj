@@ -56,7 +56,7 @@ train_vectors = vectorizer.fit_transform(train_data.values.astype('U'))
 test_vectors = vectorizer.transform(test_data.values.astype('U'))
 
 # Classificação
-classifier = MultinomialNB(alpha=0.0)
+classifier = MultinomialNB(alpha=0.01)
 classifier.fit(train_vectors, train_labels)
 prediction = classifier.predict(test_vectors)
 probabilities = classifier.predict_proba(test_vectors)
