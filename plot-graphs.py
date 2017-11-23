@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
 import pandas as pd
-from sqlalchemy import create_engine
 import sys
+from sqlalchemy import create_engine
+
 
 def get_valence_data(ticker):
     df = pd.read_sql_query('SELECT publication_date, valence, title FROM news_table WHERE ticker="{0}"'.format(ticker), engine)
@@ -11,20 +11,27 @@ def get_valence_data(ticker):
     df['date_num'] = df.publication_date.values.astype('datetime64[s]').astype('int')
     df.sort_values(by='publication_date')
 
-    df.query("publication_date >= '{0}'".format(date_from), inplace=True)
+    df.query("publication_date >= '{0}' and publication_date <= '{1}'".format(date_from, date_to), inplace=True)
     # Agrega valências por dia
     return df.groupby([pd.Grouper(freq='D',key='publication_date')]).mean()
 
 # Verifica argumentos de chamada
-if len(sys.argv) == 1:
+num_params = len(sys.argv)
+if num_params == 1:
     # desde o inicio dos tempos :)
-    date_from = "1970-01-01"
-elif (sys.argv[1] == '-h'):
-    print("Uso: plot-graphs.py YYYY-MM-DD, plota desde a data")
-    print("Sem argumentos, plota a base toda.")
+    date_from = "19700101"
+    date_to = "20171231"
+elif num_params == 2 and sys.argv[1] == '-h':
+    print("Uso: plot-graphs.py YYYY-MM-DD plota desde a data")
+    print("     plot-graphs.py YYYY-MM-DD YYYY2-MM2-DD2 entre datas")
+    print("     plot-graphs.py Sem argumentos, plota a base toda.")
     sys.exit()
+elif (num_params == 2):
+    date_from = sys.argv[1]
+    date_to = "20171231"
 else:
     date_from = sys.argv[1]
+    date_to = sys.argv[2]
 
 engine = create_engine('sqlite:///news.db')
 
@@ -37,8 +44,6 @@ else:
     fig.suptitle('Valências de Notícias e Valores de Ações desde {0}'.format(date_from))
 
 ticker_lst = ['AAPL', 'CSCO', 'FB', 'GOOGL', 'IBM', 'INTC', 'MSFT', 'ORCL', 'SAP', 'TSM']
-#ticker_lst = ['AAPL', 'CSCO', 'FB', 'IBM', 'INTC', 'MSFT', 'ORCL', 'SAP', 'TSM']
-#ticker_lst = ['GOOGL']
 
 subplot_line = 0
 subplot_col = 0
