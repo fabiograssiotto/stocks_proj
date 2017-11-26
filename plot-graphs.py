@@ -36,7 +36,7 @@ else:
 engine = create_engine('sqlite:///news.db')
 
 sns.set_style("white")
-fig, axs = plt.subplots(2,5)
+fig, axs = plt.subplots(2,5, figsize=(15,10))
 
 if len(sys.argv) == 1:
     fig.suptitle('Valências de Notícias e Valores de Ações', fontsize=20)
