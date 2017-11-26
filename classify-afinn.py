@@ -68,3 +68,7 @@ test_df['valence'] = prediction
 # Escreve a classificação no banco de dados.
 test_df = test_df.drop('index', axis = 1)
 test_df.to_sql('news_table', engine, if_exists='replace')
+
+# Cria tabela para identificar o classificador empregado.
+class_df = pd.DataFrame(['AFINN'], columns=['classifier'])
+class_df.to_sql('classifier_table', engine, if_exists='replace')

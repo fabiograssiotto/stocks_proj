@@ -4,6 +4,9 @@ import pandas as pd
 import sys
 from sqlalchemy import create_engine
 
+def get_classifier():
+    df = pd.read_sql_query('SELECT classifier FROM classifier_table', engine)
+    return df.iloc[0]['classifier']
 
 def get_valence_data(ticker):
     df = pd.read_sql_query('SELECT publication_date, valence, title FROM news_table WHERE ticker="{0}"'.format(ticker), engine)
@@ -39,9 +42,9 @@ sns.set_style("white")
 fig, axs = plt.subplots(2,5, figsize=(15,10))
 
 if len(sys.argv) == 1:
-    fig.suptitle('Valências de Notícias e Valores de Ações', fontsize=20)
+    fig.suptitle('Valências de Notícias e Valores de Ações, Classificador {0}'.format(get_classifier()), fontsize=20)
 else:
-    fig.suptitle('Valências de Notícias e Valores de Ações desde {0}'.format(date_from))
+    fig.suptitle('Valências de Notícias e Valores de Ações desde {0}, Classificador {1}'.format(date_from, get_classifier()), fontsize=20)
 
 ticker_lst = ['AAPL', 'CSCO', 'FB', 'GOOGL', 'IBM', 'INTC', 'MSFT', 'ORCL', 'SAP', 'TSM']
 
